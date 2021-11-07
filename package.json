@@ -11,7 +11,7 @@
     "release": "np --no-cleanup"
   },
   "files": [
-    "dist",
+    "dist/**",
     "src/**"
   ],
   "author": "",

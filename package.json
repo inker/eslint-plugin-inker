@@ -8,7 +8,7 @@
     "test": "jest --no-cache",
     "lint": "eslint './src/**/*.ts'",
     "build": "rm -rf dist && tsc --outDir dist",
-    "release": "np --yolo --no-publish"
+    "release": "np --no-cleanup"
   },
   "files": [
     "dist",

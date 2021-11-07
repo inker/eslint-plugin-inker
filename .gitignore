@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+*~
+*.swp
+*.swo
+/dist/
+.env
+tags
+debug.log
+.vscode
+.idea
+bundle-stats/
+.webpack-build-cache
+playground

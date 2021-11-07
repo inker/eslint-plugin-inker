@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "pretty": true,
+    "declaration": true,
+    "alwaysStrict": true,
+    // "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "esModuleInterop": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "downlevelIteration": true,
+    "lib": [
+      "ESNext"
+    ],
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "text"
+  ]
+}

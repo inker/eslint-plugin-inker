@@ -24,13 +24,12 @@ export default {
 
           if (isError) {
             context.report({
-              node,
+              node: currentImport,
               message: 'Import members must be on separate lines',
               fix(fixer) {
                 return fixer.insertTextBefore(currentImport, '\n')
               },
             })
-            return
           }
 
           previousImport = currentImport

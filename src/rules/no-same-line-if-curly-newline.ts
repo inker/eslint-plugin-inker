@@ -7,7 +7,12 @@ import type {
   ObjectPattern,
 } from 'estree'
 
-function findProblematicNode(node: ObjectExpression | ObjectPattern) {
+type ObjectNode = ObjectExpression | ObjectPattern
+
+function findProblematicNodes(
+  node: ObjectNode,
+  onFind: (problematicNode: ObjectNode['properties'][0]) => void,
+) {
   if (node.loc!.start.line === node.loc?.end.line) {
     return
   }
@@ -22,7 +27,7 @@ function findProblematicNode(node: ObjectExpression | ObjectPattern) {
     const currentProp = properties[i]
 
     if (currentProp.loc!.start.line === prop.loc!.end.line) {
-      return currentProp
+      onFind(currentProp)
     }
 
     prop = currentProp
@@ -37,32 +42,26 @@ export default {
   create(context) {
     return {
       ObjectExpression(node) {
-        const problematicNode = findProblematicNode(node)
-        if (!problematicNode) {
-          return
-        }
-
-        context.report({
-          node,
-          message: 'Object properties must be on separate lines',
-          fix(fixer) {
-            return fixer.insertTextBefore(problematicNode, '\n')
-          },
+        findProblematicNodes(node, (problematicNode) => {
+          context.report({
+            node: problematicNode,
+            message: 'Object properties must be on separate lines',
+            fix(fixer) {
+              return fixer.insertTextBefore(problematicNode, '\n')
+            },
+          })
         })
       },
 
       ObjectPattern(node) {
-        const problematicNode = findProblematicNode(node)
-        if (!problematicNode) {
-          return
-        }
-
-        context.report({
-          node,
-          message: 'Variables from object destructuring must be on separate lines',
-          fix(fixer) {
-            return fixer.insertTextBefore(problematicNode, '\n')
-          },
+        findProblematicNodes(node, (problematicNode) => {
+          context.report({
+            node: problematicNode,
+            message: 'Variables from object destructuring must be on separate lines',
+            fix(fixer) {
+              return fixer.insertTextBefore(problematicNode, '\n')
+            },
+          })
         })
       },
     }

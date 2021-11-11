@@ -23,15 +23,15 @@ function findProblematicNodes(
     return
   }
 
-  let prop = properties[0]
+  let previousProp = properties[0]
   for (let i = 1; i < properties.length; ++i) {
     const currentProp = properties[i]
 
-    if (currentProp.loc!.start.line === prop.loc!.end.line) {
+    if (currentProp.loc!.start.line === previousProp.loc!.end.line) {
       onFind(currentProp)
     }
 
-    prop = currentProp
+    previousProp = currentProp
   }
 }
 

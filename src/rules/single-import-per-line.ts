@@ -4,7 +4,7 @@ import type {
 
 export default {
   meta: {
-    fixable: 'code',
+    fixable: 'whitespace',
   },
 
   create(context) {

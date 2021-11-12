@@ -14,7 +14,7 @@ function findProblematicNodes(
   node: ObjectNode,
   onFind: (problematicNode: ObjectNodeProperty) => void,
 ) {
-  if (node.loc!.start.line === node.loc?.end.line) {
+  if (node.loc!.start.line === node.loc!.end.line) {
     return
   }
 

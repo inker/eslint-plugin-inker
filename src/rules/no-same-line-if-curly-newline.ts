@@ -8,11 +8,10 @@ import type {
 } from 'estree'
 
 type ObjectNode = ObjectExpression | ObjectPattern
-type ObjectNodeProperty = ObjectNode['properties'][0]
 
-function findProblematicNodes(
-  node: ObjectNode,
-  onFind: (problematicNode: ObjectNodeProperty) => void,
+function findProblematicNodes<N extends ObjectNode>(
+  node: N,
+  onFind: (problematicNode: N['properties'][0]) => void,
 ) {
   if (node.loc!.start.line === node.loc!.end.line) {
     return

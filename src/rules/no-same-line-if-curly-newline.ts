@@ -9,29 +9,30 @@ import type {
 
 type ObjectNode = ObjectExpression | ObjectPattern
 
-function findProblematicNodes<N extends ObjectNode>(
-  node: N,
-  onFind: (problematicNode: N['properties'][0]) => void,
-) {
+function findProblematicNodes<N extends ObjectNode>(node: N) {
   if (node.loc!.start.line === node.loc!.end.line) {
-    return
+    return []
   }
 
   const { properties } = node
   if (properties.length < 2) {
-    return
+    return []
   }
+
+  const problematicNodes: N['properties'][0][] = []
 
   let previousProp = properties[0]
   for (let i = 1; i < properties.length; ++i) {
     const currentProp = properties[i]
 
     if (currentProp.loc!.start.line === previousProp.loc!.end.line) {
-      onFind(currentProp)
+      problematicNodes.push(currentProp)
     }
 
     previousProp = currentProp
   }
+
+  return problematicNodes
 }
 
 export default {
@@ -42,7 +43,9 @@ export default {
   create(context) {
     return {
       ObjectExpression(node) {
-        findProblematicNodes(node, (problematicNode) => {
+        const problematicNodes = findProblematicNodes(node)
+
+        for (const problematicNode of problematicNodes) {
           context.report({
             node: problematicNode,
             message: 'Object properties must be on separate lines',
@@ -50,11 +53,13 @@ export default {
               return fixer.insertTextBefore(problematicNode, '\n')
             },
           })
-        })
+        }
       },
 
       ObjectPattern(node) {
-        findProblematicNodes(node, (problematicNode) => {
+        const problematicNodes = findProblematicNodes(node)
+
+        for (const problematicNode of problematicNodes) {
           context.report({
             node: problematicNode,
             message: 'Variables from object destructuring must be on separate lines',
@@ -62,7 +67,7 @@ export default {
               return fixer.insertTextBefore(problematicNode, '\n')
             },
           })
-        })
+        }
       },
     }
   },

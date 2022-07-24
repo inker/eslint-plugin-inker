@@ -4,4 +4,8 @@ module.exports = {
   extends: [
     '@inker/eslint-config-typescript',
   ],
+
+  rules: {
+    'unicorn/filename-case': 0,
+  },
 }

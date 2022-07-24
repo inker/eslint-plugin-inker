@@ -12,7 +12,7 @@ export default {
         } = node
 
         const isError = object.type === 'ThisExpression'
-          && !computed
+          && computed
 
         if (!isError) {
           return

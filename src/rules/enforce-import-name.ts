@@ -2,6 +2,12 @@ import type {
   Rule,
 } from 'eslint'
 
+import micromatch from 'micromatch'
+
+import type {
+  JSONSchema4,
+} from 'json-schema'
+
 import {
   compact,
 } from 'lodash'
@@ -24,13 +30,37 @@ interface ImportNameMember extends BaseImportName {
 
 type ImportNameObj = ImportNameMember | ImportNameDefault | ImportNameNamespace
 
-interface Path {
-  name: string,
+interface BasePath {
   importNames: readonly ImportNameObj[],
 }
 
+interface PathWithName extends BasePath {
+  name: string,
+}
+
+interface PathWithPattern extends BasePath {
+  pattern: string | readonly string[],
+}
+
+type Path = PathWithName | PathWithPattern
+
 interface Options {
   paths: readonly Path[],
+}
+
+const importNamesSchema: JSONSchema4 = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      imported: {
+        type: 'string',
+      },
+      local: {
+        type: 'string',
+      },
+    },
+  },
 }
 
 export default {
@@ -42,25 +72,34 @@ export default {
           type: 'array',
           items: {
             type: 'object',
-            properties: {
-              name: {
-                type: 'string',
-              },
-              importNames: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    imported: {
-                      type: 'string',
-                    },
-                    local: {
-                      type: 'string',
-                    },
+            oneOf: [
+              {
+                properties: {
+                  name: {
+                    type: 'string',
                   },
+                  importNames: importNamesSchema,
                 },
               },
-            },
+              {
+                properties: {
+                  pattern: {
+                    oneOf: [
+                      {
+                        type: 'string',
+                      },
+                      {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
+                    ],
+                  },
+                  importNames: importNamesSchema,
+                },
+              },
+            ],
           },
         },
       },
@@ -77,7 +116,11 @@ export default {
           specifiers,
         } = node
 
-        const foundPaths = options.paths.filter(item => item.name === source.value)
+        const foundPaths = options.paths.filter(
+          item => 'name' in item
+            ? item.name === source.value
+            : micromatch.isMatch(source.value as string, item.pattern),
+        )
         if (foundPaths.length === 0) {
           return
         }

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "pretty": true,
     "declaration": true,
@@ -11,7 +11,6 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
     "lib": [
       "ESNext"
     ],

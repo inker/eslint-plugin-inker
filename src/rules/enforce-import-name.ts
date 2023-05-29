@@ -1,34 +1,23 @@
-import type {
-  Rule,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type Rule,
 } from 'eslint'
 
 import micromatch from 'micromatch'
 
-import type {
-  JSONSchema4,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type JSONSchema4,
 } from 'json-schema'
 
 import {
   compact,
 } from 'lodash'
 
-interface BaseImportName {
+interface ImportNameObj {
+  imported: string,
   local: string,
 }
-
-interface ImportNameDefault extends BaseImportName {
-  imported: 'default',
-}
-
-interface ImportNameNamespace extends BaseImportName {
-  imported: 'namespace',
-}
-
-interface ImportNameMember extends BaseImportName {
-  imported: string,
-}
-
-type ImportNameObj = ImportNameMember | ImportNameDefault | ImportNameNamespace
 
 interface BasePath {
   importNames: readonly ImportNameObj[],
@@ -107,6 +96,7 @@ export default {
   },
 
   create(context) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: Options = context.options[0] ?? {}
 
     return {
@@ -134,7 +124,7 @@ export default {
           if (s.type === 'ImportSpecifier') {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === s.imported.name,
-            ) as ImportNameMember
+            )
 
             return foundImportedName && {
               node: s.local,
@@ -145,7 +135,7 @@ export default {
           if (s.type === 'ImportDefaultSpecifier') {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === 'default',
-            ) as ImportNameDefault
+            )
 
             return foundImportedName && {
               node: s.local,
@@ -153,10 +143,11 @@ export default {
             }
           }
 
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (s.type === 'ImportNamespaceSpecifier') {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === 'namespace',
-            ) as ImportNameNamespace
+            )
 
             return foundImportedName && {
               node: s.local,

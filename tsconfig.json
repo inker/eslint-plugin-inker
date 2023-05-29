@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "module": "CommonJS",
-    "sourceMap": true,
+    "module": "ESNext",
     "moduleResolution": "Node",
     "pretty": true,
     "declaration": true,
-    "alwaysStrict": true,
-    // "allowSyntheticDefaultImports": true,
-    "strictNullChecks": true,
-    "strictBindCallApply": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "strict": true,
     "esModuleInterop": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
     "downlevelIteration": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "lib": [
       "ESNext"
     ],
@@ -24,6 +22,6 @@
   ],
   "exclude": [
     "node_modules",
-    "text"
+    "test"
   ]
 }

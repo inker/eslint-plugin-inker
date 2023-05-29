@@ -8,7 +8,6 @@ import {
 
 interface BaseImportName {
   local: string,
-  message: string,
 }
 
 interface ImportNameDefault extends BaseImportName {
@@ -99,7 +98,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: foundImportedName.message,
+              message: `Use the following name instead: "${foundImportedName.local}"`,
             }
           }
 
@@ -110,7 +109,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: foundImportedName.message,
+              message: `Use the following name instead: "${foundImportedName.local}"`,
             }
           }
 
@@ -121,7 +120,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: foundImportedName.message,
+              message: `Use the following name instead: "${foundImportedName.local}"`,
             }
           }
 

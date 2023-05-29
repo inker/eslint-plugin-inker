@@ -16,8 +16,8 @@ const WILDCARD_OTHER = '*'
 
 interface OptionsObj {
   name: string,
-  before?: string[],
-  after?: string[],
+  before?: readonly string[],
+  after?: readonly string[],
 }
 
 type Options = OptionsObj[]

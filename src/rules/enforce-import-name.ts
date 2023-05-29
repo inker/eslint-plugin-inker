@@ -95,7 +95,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: `Use the following name instead: "${foundImportedName.local}"`,
+              message: `Use the following local name instead: "${foundImportedName.local}"`,
             }
           }
 
@@ -106,7 +106,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: `Use the following name instead: "${foundImportedName.local}"`,
+              message: `Use the following local name instead: "${foundImportedName.local}"`,
             }
           }
 
@@ -117,7 +117,7 @@ export default {
 
             return foundImportedName && {
               node: s.local,
-              message: `Use the following name instead: "${foundImportedName.local}"`,
+              message: `Use the following local name instead: "${foundImportedName.local}"`,
             }
           }
 

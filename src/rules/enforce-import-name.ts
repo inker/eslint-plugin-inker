@@ -51,9 +51,6 @@ export default {
                 items: {
                   type: 'object',
                   properties: {
-                    message: {
-                      type: 'string',
-                    },
                     imported: {
                       type: 'string',
                     },

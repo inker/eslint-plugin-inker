@@ -58,8 +58,6 @@ export default {
   },
 
   create(context) {
-    const sourceCode = context.getSourceCode()
-
     const options: Options = context.options[0] ?? []
 
     const optionsEntries = options.map(item => {
@@ -111,6 +109,8 @@ export default {
           node,
           message: `Invalid import order for "${importSource}".`,
           fix(fixer) {
+            const { sourceCode } = context
+
             const orderedImports = orderBy(importedMembers, iteratee)
               .map(item => sourceCode.getText(item))
 

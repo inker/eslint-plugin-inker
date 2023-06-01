@@ -2,13 +2,15 @@ import {
   compact,
 } from 'lodash'
 
-import type {
-  Rule,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type Rule,
 } from 'eslint'
 
-import type {
-  BaseNodeWithoutComments,
-  Node,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type BaseNodeWithoutComments,
+  type Node,
 } from 'estree'
 
 import invokeIfFunction from '../utils/invokeIfFunction'

@@ -1,5 +1,6 @@
-import type {
-  Rule,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type Rule,
 } from 'eslint'
 
 export default {

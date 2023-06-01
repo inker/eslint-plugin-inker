@@ -2,12 +2,14 @@ import {
   orderBy,
 } from 'lodash'
 
-import type {
-  Rule,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type Rule,
 } from 'eslint'
 
-import type {
-  ImportSpecifier,
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type ImportSpecifier,
 } from 'estree'
 
 import isNonDecreasing from '../utils/isNonDecreasing'

@@ -143,7 +143,6 @@ export default {
             }
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (s.type === 'ImportNamespaceSpecifier') {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === 'namespace',

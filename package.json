@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-inker",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",

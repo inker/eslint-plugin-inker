@@ -4,6 +4,10 @@ import {
 } from 'eslint'
 
 export default {
+  meta: {
+    hasSuggestions: true,
+  },
+
   create(context) {
     const isVariableNameTaken = (name: string) => {
       const scope = context.getScope()

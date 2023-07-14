@@ -9,16 +9,6 @@ export default {
   },
 
   create(context) {
-    const isVariableNameTaken = (name: string) => {
-      const scope = context.getScope()
-      return scope.variables.some(variable => variable.name === name)
-    }
-
-    const getVariableUsages = (name: string) => {
-      const scope = context.getScope()
-      return scope.references.filter(ref => ref.identifier.name === name)
-    }
-
     return {
       VariableDeclarator(node) {
         const {
@@ -46,18 +36,20 @@ export default {
 
         const suggestedName = `${id.name}Ref`
 
-        type Suggest = Parameters<typeof context.report>[0]['suggest']
+        const scope = context.getScope()
+        const isNameTaken = scope.variables.some(variable => variable.name === suggestedName)
 
-        const suggest: Suggest = isVariableNameTaken(suggestedName)
+        type Suggest = Parameters<typeof context.report>[0]['suggest']
+        const suggest: Suggest = isNameTaken
           ? undefined
           : [
             {
               desc: `Rename variable to '${suggestedName}'`,
               fix(fixer) {
-                const usages = getVariableUsages(id.name)
-                const referenceIdentifiers = usages.map(ref => ref.identifier)
+                const references = context.getDeclaredVariables(node)[0]?.references ?? []
+                const referenceIdentifiers = references.map(ref => ref.identifier)
                 return [
-                  // id,
+                  id,
                   ...referenceIdentifiers,
                 ].map(identifier => fixer.replaceText(identifier, suggestedName))
               },

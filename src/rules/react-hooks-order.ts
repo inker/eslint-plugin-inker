@@ -26,7 +26,11 @@ export default {
 
   create(context) {
     const { order } = context.options[0] as Options
+
     const indexByHook = new Map(order.map((hook, i) => [hook, i] as const))
+
+    const getHookIndex = (name: string) =>
+      indexByHook.get(name) ?? Number.MAX_SAFE_INTEGER
 
     return {
       BlockStatement(node) {
@@ -57,10 +61,10 @@ export default {
               continue
             }
 
-            const hookIdx = indexByHook.get(name) ?? Number.MAX_SAFE_INTEGER
+            const hookIdx = getHookIndex(name)
 
             for (const prevHook of previousHooks) {
-              const prevHookIdx = indexByHook.get(prevHook) ?? Number.MAX_SAFE_INTEGER
+              const prevHookIdx = getHookIndex(prevHook)
               if (hookIdx < prevHookIdx) {
                 context.report({
                   node: statement,

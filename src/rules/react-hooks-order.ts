@@ -82,9 +82,11 @@ export default {
                         const { sourceCode } = context
 
                         const statementText = sourceCode.getText(statement)
+                        const prevHookNodeIndentation = prevHookNode.loc?.start.column ?? 0
+                        const indentation = ' '.repeat(prevHookNodeIndentation)
                         return [
                           fixer.remove(statement),
-                          fixer.insertTextBefore(prevHookNode, `${statementText};`),
+                          fixer.insertTextBefore(prevHookNode, `${statementText};\n${indentation}`),
                         ]
                       },
                     },

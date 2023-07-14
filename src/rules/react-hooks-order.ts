@@ -3,6 +3,11 @@ import {
   type Rule,
 } from 'eslint'
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type VariableDeclaration,
+} from 'estree'
+
 interface Options {
   order: readonly string[],
 }
@@ -22,6 +27,7 @@ export default {
         },
       },
     ],
+    hasSuggestions: true,
   },
 
   create(context) {
@@ -34,7 +40,7 @@ export default {
 
     return {
       BlockStatement(node) {
-        const previousHooks = new Set<string>()
+        const previousHooks = new Map<string, VariableDeclaration>()
 
         for (const statement of node.body) {
           if (statement.type !== 'VariableDeclaration') {
@@ -63,18 +69,35 @@ export default {
 
             const hookIdx = getHookIndex(name)
 
-            for (const prevHook of previousHooks) {
-              const prevHookIdx = getHookIndex(prevHook)
+            for (const [prevHookName, prevHookNode] of previousHooks) {
+              const prevHookIdx = getHookIndex(prevHookName)
               if (hookIdx < prevHookIdx) {
                 context.report({
                   node: statement,
-                  message: `'${name}' should be declared before '${prevHook}'`,
+                  message: `'${name}' should be declared before '${prevHookName}'`,
+                  suggest: [
+                    {
+                      desc: `Move before first '${prevHookName}'`,
+                      fix(fixer) {
+                        const { sourceCode } = context
+
+                        const statementText = sourceCode.getText(statement)
+                        return [
+                          fixer.remove(statement),
+                          fixer.insertTextBefore(prevHookNode, `${statementText};`),
+                        ]
+                      },
+                    },
+                  ],
                 })
                 return
               }
             }
 
-            previousHooks.add(name)
+            // TODO: replace with "upsert" once it's available
+            if (!previousHooks.has(name)) {
+              previousHooks.set(name, statement)
+            }
           }
         }
       },

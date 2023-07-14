@@ -26,7 +26,7 @@ export default {
 
   create(context) {
     const { order } = context.options[0] as Options
-    const positionByHook = new Map(order.map((hook, i) => [hook, i] as const))
+    const indexByHook = new Map(order.map((hook, i) => [hook, i] as const))
 
     return {
       BlockStatement(node) {
@@ -57,11 +57,11 @@ export default {
               continue
             }
 
-            const hookPos = positionByHook.get(name) ?? Number.MAX_SAFE_INTEGER
+            const hookIdx = indexByHook.get(name) ?? Number.MAX_SAFE_INTEGER
 
             for (const prevHook of previousHooks) {
-              const prevHookPos = positionByHook.get(prevHook) ?? Number.MAX_SAFE_INTEGER
-              if (hookPos < prevHookPos) {
+              const prevHookIdx = indexByHook.get(prevHook) ?? Number.MAX_SAFE_INTEGER
+              if (hookIdx < prevHookIdx) {
                 context.report({
                   node: statement,
                   message: `'${name}' should be declared before '${prevHook}'`,

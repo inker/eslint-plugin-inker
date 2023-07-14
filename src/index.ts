@@ -5,6 +5,7 @@ import noSameLineForElements from './rules/no-same-line-for-elements'
 import noThisBrackets from './rules/no-this-brackets'
 import noTrueAsDefaultValue from './rules/no-true-as-default'
 import reactHooksOrder from './rules/react-hooks-order'
+import reactRefName from './rules/react-ref-name'
 import singleImportPerLine from './rules/single-import-per-line'
 
 export = {
@@ -16,6 +17,7 @@ export = {
     'no-this-brackets': noThisBrackets,
     'no-true-as-default': noTrueAsDefaultValue,
     'react-hooks-order': reactHooksOrder,
+    'react-ref-name': reactRefName,
     'single-import-per-line': singleImportPerLine,
   },
 }

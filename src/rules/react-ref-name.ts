@@ -3,11 +3,6 @@ import {
   type Rule,
 } from 'eslint'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import {
-  type Node,
-} from 'estree'
-
 export default {
   create(context) {
     const isVariableNameTaken = (name: string) => {
@@ -15,9 +10,9 @@ export default {
       return scope.variables.some(variable => variable.name === name)
     }
 
-    const getVariableUsages = (node: Node) => {
-      const variable = context.getDeclaredVariables(node)[0]
-      return variable.references.map(ref => ref.identifier)
+    const getVariableUsages = (name: string) => {
+      const scope = context.getScope()
+      return scope.references.filter(ref => ref.identifier.name === name)
     }
 
     return {
@@ -55,10 +50,11 @@ export default {
             {
               desc: `Rename variable to '${suggestedName}'`,
               fix(fixer) {
-                const usages = getVariableUsages(id)
+                const usages = getVariableUsages(id.name)
+                const referenceIdentifiers = usages.map(ref => ref.identifier)
                 return [
                   id,
-                  ...usages,
+                  ...referenceIdentifiers,
                 ].map(identifier => fixer.replaceText(identifier, suggestedName))
               },
             },

@@ -49,7 +49,7 @@ export default {
                 const references = context.getDeclaredVariables(node)[0]?.references ?? []
                 const referenceIdentifiers = references.map(ref => ref.identifier)
                 return [
-                  id,
+                  // id,
                   ...referenceIdentifiers,
                 ].map(identifier => fixer.replaceText(identifier, suggestedName))
               },

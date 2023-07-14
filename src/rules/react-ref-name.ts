@@ -49,7 +49,7 @@ export default {
 
         type Suggest = Parameters<typeof context.report>[0]['suggest']
 
-        const suggest: Suggest = isVariableNameTaken(id.name)
+        const suggest: Suggest = isVariableNameTaken(suggestedName)
           ? undefined
           : [
             {

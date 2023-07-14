@@ -57,7 +57,7 @@ export default {
                 const usages = getVariableUsages(id.name)
                 const referenceIdentifiers = usages.map(ref => ref.identifier)
                 return [
-                  id,
+                  // id,
                   ...referenceIdentifiers,
                 ].map(identifier => fixer.replaceText(identifier, suggestedName))
               },

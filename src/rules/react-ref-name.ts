@@ -47,11 +47,7 @@ export default {
               desc: `Rename variable to '${suggestedName}'`,
               fix(fixer) {
                 const references = context.getDeclaredVariables(node)[0]?.references ?? []
-                const referenceIdentifiers = references.map(ref => ref.identifier)
-                return [
-                  // id,
-                  ...referenceIdentifiers,
-                ].map(identifier => fixer.replaceText(identifier, suggestedName))
+                return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
               },
             },
           ]

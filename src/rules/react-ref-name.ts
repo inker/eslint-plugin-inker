@@ -3,90 +3,104 @@ import {
   type Rule,
 } from 'eslint'
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  type PropertyDefinition,
+  type VariableDeclarator,
+} from 'estree'
+
+const refCreationFuncNames = new Set([
+  'createRef',
+  'useRef',
+])
+
+const isIdValidName = (name: string) =>
+  name === 'ref' || name.endsWith('Ref')
+
 export default {
   meta: {
     hasSuggestions: true,
   },
 
   create(context) {
-    return {
-      VariableDeclarator(node) {
-        const {
-          id,
-          init,
-        } = node
+    const variableDeclaratorStrategy = (node: VariableDeclarator) => {
+      const { id } = node
+      if (id.type !== 'Identifier') {
+        return
+      }
 
-        if (init?.type !== 'CallExpression') {
-          return
-        }
+      if (isIdValidName(id.name)) {
+        return
+      }
 
-        const { callee } = init
-        if (callee.type !== 'Identifier' || callee.name !== 'useRef') {
-          return
-        }
+      const suggestedName = `${id.name}Ref`
 
-        if (id.type !== 'Identifier') {
-          return
-        }
+      const scope = context.getScope()
+      const isNameTaken = scope.variables.some(variable => variable.name === suggestedName)
 
-        const isValidName = id.name === 'ref' || id.name.endsWith('Ref')
-        if (isValidName) {
-          return
-        }
-
-        const suggestedName = `${id.name}Ref`
-
-        const scope = context.getScope()
-        const isNameTaken = scope.variables.some(variable => variable.name === suggestedName)
-
-        type Suggest = Parameters<typeof context.report>[0]['suggest']
-        const suggest: Suggest = isNameTaken
-          ? undefined
-          : [
-            {
-              desc: `Rename variable to '${suggestedName}'`,
-              fix(fixer) {
-                const references = context.getDeclaredVariables(node)[0]?.references ?? []
-                return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
-              },
+      type Suggest = Parameters<typeof context.report>[0]['suggest']
+      const suggest: Suggest = isNameTaken
+        ? undefined
+        : [
+          {
+            desc: `Rename variable to '${suggestedName}'`,
+            fix(fixer) {
+              const references = context.getDeclaredVariables(node)[0]?.references ?? []
+              return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
             },
-          ]
+          },
+        ]
 
-        context.report({
-          node: id,
-          message: 'Variable names for createRef should be "ref" or end with "Ref".',
-          suggest,
-        })
-      },
+      context.report({
+        node: id,
+        message: 'Variable name should be "ref" or end with "Ref".',
+        suggest,
+      })
+    }
 
-      PropertyDefinition(node) {
-        const {
-          key,
-          value,
-        } = node
+    const propertyDefinitionStrategy = (node: PropertyDefinition) => {
+      const { key } = node
+      if (key.type !== 'Identifier') {
+        return
+      }
 
-        if (value?.type !== 'CallExpression') {
+      if (isIdValidName(key.name)) {
+        return
+      }
+
+      context.report({
+        node: key,
+        message: 'Property name should be "ref" or end with "Ref".',
+      })
+    }
+
+    return {
+      CallExpression(node) {
+        if (node.type !== 'CallExpression') {
           return
         }
 
-        const { callee } = value
-        if (callee.type !== 'Identifier' || callee.name !== 'createRef') {
+        const { callee } = node
+        if (callee.type !== 'Identifier' || !refCreationFuncNames.has(callee.name)) {
           return
         }
 
-        if (key.type !== 'Identifier') {
-          return
-        }
+        const { parent } = node
+        switch (parent.type) {
+          case 'VariableDeclarator': {
+            variableDeclaratorStrategy(parent)
+            break
+          }
 
-        const isValidName = key.name === 'ref' || key.name.endsWith('Ref')
-        if (isValidName) {
-          return
-        }
+          case 'PropertyDefinition': {
+            propertyDefinitionStrategy(parent)
+            break
+          }
 
-        context.report({
-          node: key,
-          message: 'Property names for createRef should be "ref" or end with "Ref".',
-        })
+          default: {
+            break
+          }
+        }
       },
     }
   },

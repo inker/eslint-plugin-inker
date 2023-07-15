@@ -58,6 +58,7 @@ export default {
   },
 
   create(context) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: Options = context.options[0] ?? []
 
     const optionsEntries = options.map(item => {

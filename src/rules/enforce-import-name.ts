@@ -49,52 +49,62 @@ const importNamesSchema: JSONSchema4 = {
         type: 'string',
       },
     },
+    required: [
+      'imported',
+      'local',
+    ],
   },
 }
 
 export default {
   meta: {
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          paths: {
-            type: 'array',
-            items: {
-              type: 'object',
-              oneOf: [
-                {
-                  properties: {
-                    name: {
-                      type: 'string',
-                    },
-                    importNames: importNamesSchema,
+    schema: {
+      type: 'object',
+      properties: {
+        paths: {
+          type: 'array',
+          items: {
+            type: 'object',
+            oneOf: [
+              {
+                properties: {
+                  name: {
+                    type: 'string',
                   },
+                  importNames: importNamesSchema,
                 },
-                {
-                  properties: {
-                    pattern: {
-                      oneOf: [
-                        {
+                required: [
+                  'name',
+                  'importNames',
+                ],
+              },
+              {
+                properties: {
+                  pattern: {
+                    oneOf: [
+                      {
+                        type: 'string',
+                      },
+                      {
+                        type: 'array',
+                        items: {
                           type: 'string',
                         },
-                        {
-                          type: 'array',
-                          items: {
-                            type: 'string',
-                          },
-                        },
-                      ],
-                    },
-                    importNames: importNamesSchema,
+                      },
+                    ],
                   },
+                  importNames: importNamesSchema,
                 },
-              ],
-            },
+                required: [
+                  'pattern',
+                  'importNames',
+                ],
+              },
+            ],
           },
         },
       },
-    ],
+    },
   },
 
   create(context) {

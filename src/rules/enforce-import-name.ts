@@ -54,45 +54,47 @@ const importNamesSchema: JSONSchema4 = {
 
 export default {
   meta: {
-    schema: {
-      type: 'object',
-      properties: {
-        paths: {
-          type: 'array',
-          items: {
-            type: 'object',
-            oneOf: [
-              {
-                properties: {
-                  name: {
-                    type: 'string',
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          paths: {
+            type: 'array',
+            items: {
+              type: 'object',
+              oneOf: [
+                {
+                  properties: {
+                    name: {
+                      type: 'string',
+                    },
+                    importNames: importNamesSchema,
                   },
-                  importNames: importNamesSchema,
                 },
-              },
-              {
-                properties: {
-                  pattern: {
-                    oneOf: [
-                      {
-                        type: 'string',
-                      },
-                      {
-                        type: 'array',
-                        items: {
+                {
+                  properties: {
+                    pattern: {
+                      oneOf: [
+                        {
                           type: 'string',
                         },
-                      },
-                    ],
+                        {
+                          type: 'array',
+                          items: {
+                            type: 'string',
+                          },
+                        },
+                      ],
+                    },
+                    importNames: importNamesSchema,
                   },
-                  importNames: importNamesSchema,
                 },
-              },
-            ],
+              ],
+            },
           },
         },
       },
-    },
+    ],
   },
 
   create(context) {

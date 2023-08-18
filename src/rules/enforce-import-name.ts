@@ -57,55 +57,57 @@ const importNamesSchema: JSONSchema4 = {
 }
 
 export default {
-  meta: {
-    schema: {
-      type: 'object',
-      properties: {
-        paths: {
-          type: 'array',
-          items: {
-            type: 'object',
-            oneOf: [
-              {
-                properties: {
-                  name: {
-                    type: 'string',
+  meta: [
+    {
+      schema: {
+        type: 'object',
+        properties: {
+          paths: {
+            type: 'array',
+            items: {
+              type: 'object',
+              oneOf: [
+                {
+                  properties: {
+                    name: {
+                      type: 'string',
+                    },
+                    importNames: importNamesSchema,
                   },
-                  importNames: importNamesSchema,
+                  required: [
+                    'name',
+                    'importNames',
+                  ],
                 },
-                required: [
-                  'name',
-                  'importNames',
-                ],
-              },
-              {
-                properties: {
-                  pattern: {
-                    oneOf: [
-                      {
-                        type: 'string',
-                      },
-                      {
-                        type: 'array',
-                        items: {
+                {
+                  properties: {
+                    pattern: {
+                      oneOf: [
+                        {
                           type: 'string',
                         },
-                      },
-                    ],
+                        {
+                          type: 'array',
+                          items: {
+                            type: 'string',
+                          },
+                        },
+                      ],
+                    },
+                    importNames: importNamesSchema,
                   },
-                  importNames: importNamesSchema,
+                  required: [
+                    'pattern',
+                    'importNames',
+                  ],
                 },
-                required: [
-                  'pattern',
-                  'importNames',
-                ],
-              },
-            ],
+              ],
+            },
           },
         },
       },
     },
-  },
+  ],
 
   create(context) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

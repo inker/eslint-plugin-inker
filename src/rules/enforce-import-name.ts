@@ -149,7 +149,10 @@ export default {
                   desc: `Rename to '${suggestedName}'`,
                   fix(fixer) {
                     const references = context.getDeclaredVariables(s)[0]?.references ?? []
-                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                    return [
+                      s.local,
+                      ...references.map(ref => ref.identifier),
+                    ].map(identifier => fixer.replaceText(identifier, suggestedName))
                   },
                 },
               ],
@@ -169,7 +172,10 @@ export default {
                   desc: `Rename to '${suggestedName}'`,
                   fix(fixer) {
                     const references = context.getDeclaredVariables(s)[0]?.references ?? []
-                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                    return [
+                      s.local,
+                      ...references.map(ref => ref.identifier),
+                    ].map(identifier => fixer.replaceText(identifier, suggestedName))
                   },
                 },
               ],
@@ -189,7 +195,10 @@ export default {
                   desc: `Rename to '${suggestedName}'`,
                   fix(fixer) {
                     const references = context.getDeclaredVariables(s)[0]?.references ?? []
-                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                    return [
+                      s.local,
+                      ...references.map(ref => ref.identifier),
+                    ].map(identifier => fixer.replaceText(identifier, suggestedName))
                   },
                 },
               ],

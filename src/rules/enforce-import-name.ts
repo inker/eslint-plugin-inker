@@ -57,9 +57,9 @@ const importNamesSchema: JSONSchema4 = {
 }
 
 export default {
-  meta: [
-    {
-      schema: {
+  meta: {
+    schema: [
+      {
         type: 'object',
         properties: {
           paths: {
@@ -106,9 +106,9 @@ export default {
           },
         },
       },
-      hasSuggestions: true,
-    },
-  ],
+    ],
+    hasSuggestions: true,
+  },
 
   create(context) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

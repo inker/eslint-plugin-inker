@@ -1,11 +1,9 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type Rule,
 } from 'eslint'
 
 import micromatch from 'micromatch'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type JSONSchema4,
 } from 'json-schema'

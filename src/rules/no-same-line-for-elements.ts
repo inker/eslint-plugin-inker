@@ -2,12 +2,10 @@ import {
   compact,
 } from 'lodash'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type Rule,
 } from 'eslint'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type BaseNodeWithoutComments,
   type Node,

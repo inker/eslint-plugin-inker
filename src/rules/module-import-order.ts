@@ -2,12 +2,10 @@ import {
   orderBy,
 } from 'lodash'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type Rule,
 } from 'eslint'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type ImportSpecifier,
 } from 'estree'

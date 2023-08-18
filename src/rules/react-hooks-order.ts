@@ -1,9 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type Rule,
 } from 'eslint'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   type VariableDeclaration,
 } from 'estree'

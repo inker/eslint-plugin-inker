@@ -112,6 +112,8 @@ export default {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: Options = context.options[0] ?? {}
 
+    type ReportDescriptor = Parameters<typeof context.report>[0]
+
     return {
       ImportDeclaration(node) {
         const {
@@ -129,7 +131,7 @@ export default {
         }
 
         const importNames = foundPaths.flatMap(item => item.importNames)
-        const issuesWithGaps = specifiers.map(s => {
+        const issuesWithGaps = specifiers.map((s): ReportDescriptor | false => {
           const importNamesNotMatchingOptions = importNames.filter(
             o => o.local !== s.local.name,
           )
@@ -138,10 +140,19 @@ export default {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === s.imported.name,
             )
-
-            return foundImportedName && {
+            const suggestedName = foundImportedName?.local
+            return suggestedName !== undefined && {
               node: s.local,
-              message: `Use the following local name instead: "${foundImportedName.local}"`,
+              message: `Local name should be: "${suggestedName}"`,
+              suggest: [
+                {
+                  desc: `Rename to '${suggestedName}'`,
+                  fix(fixer) {
+                    const references = context.getDeclaredVariables(s.local)[0]?.references ?? []
+                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                  },
+                },
+              ],
             }
           }
 
@@ -149,10 +160,19 @@ export default {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === 'default',
             )
-
-            return foundImportedName && {
+            const suggestedName = foundImportedName?.local
+            return suggestedName !== undefined && {
               node: s.local,
-              message: `Use the following local name instead: "${foundImportedName.local}"`,
+              message: `Local name should be: "${suggestedName}"`,
+              suggest: [
+                {
+                  desc: `Rename to '${suggestedName}'`,
+                  fix(fixer) {
+                    const references = context.getDeclaredVariables(s.local)[0]?.references ?? []
+                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                  },
+                },
+              ],
             }
           }
 
@@ -160,14 +180,23 @@ export default {
             const foundImportedName = importNamesNotMatchingOptions.find(
               o => o.imported === 'namespace',
             )
-
-            return foundImportedName && {
+            const suggestedName = foundImportedName?.local
+            return suggestedName !== undefined && {
               node: s.local,
-              message: `Use the following local name instead: "${foundImportedName.local}"`,
+              message: `Local name should be: "${suggestedName}"`,
+              suggest: [
+                {
+                  desc: `Rename to '${suggestedName}'`,
+                  fix(fixer) {
+                    const references = context.getDeclaredVariables(s.local)[0]?.references ?? []
+                    return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+                  },
+                },
+              ],
             }
           }
 
-          return undefined
+          return false
         })
         const issues = compact(issuesWithGaps)
 

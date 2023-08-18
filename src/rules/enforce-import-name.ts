@@ -150,9 +150,9 @@ export default {
                   fix(fixer) {
                     const references = context.getDeclaredVariables(s)[0]?.references ?? []
                     return [
-                      s.local,
-                      ...references.map(ref => ref.identifier),
-                    ].map(identifier => fixer.replaceText(identifier, suggestedName))
+                      fixer.replaceText(s, `${s.imported.name} as ${suggestedName}`),
+                      ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
+                    ]
                   },
                 },
               ],

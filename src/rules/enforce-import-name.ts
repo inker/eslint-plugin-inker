@@ -145,7 +145,7 @@ export default {
             const suggestedName = foundImportedName?.local
             return suggestedName !== undefined && {
               node: s.local,
-              message: `Local name should be: "${suggestedName}"`,
+              message: `Local name should be "${suggestedName}"`,
               suggest: [
                 {
                   desc: `Rename to '${suggestedName}'`,
@@ -165,7 +165,7 @@ export default {
             const suggestedName = foundImportedName?.local
             return suggestedName !== undefined && {
               node: s.local,
-              message: `Local name should be: "${suggestedName}"`,
+              message: `Local name should be "${suggestedName}"`,
               suggest: [
                 {
                   desc: `Rename to '${suggestedName}'`,
@@ -185,7 +185,7 @@ export default {
             const suggestedName = foundImportedName?.local
             return suggestedName !== undefined && {
               node: s.local,
-              message: `Local name should be: "${suggestedName}"`,
+              message: `Local name should be "${suggestedName}"`,
               suggest: [
                 {
                   desc: `Rename to '${suggestedName}'`,

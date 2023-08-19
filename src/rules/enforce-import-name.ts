@@ -2,13 +2,14 @@ import {
   type Rule,
 } from 'eslint'
 
-import micromatch from 'micromatch'
+import { minimatch } from 'minimatch'
 
 import {
   type JSONSchema4,
 } from 'json-schema'
 
 import {
+  castArray,
   compact,
 } from 'lodash'
 
@@ -121,11 +122,14 @@ export default {
           specifiers,
         } = node
 
-        const foundPaths = options.paths.filter(
-          item => 'name' in item
-            ? item.name === source.value
-            : micromatch.isMatch(source.value as string, item.pattern),
-        )
+        const foundPaths = options.paths.filter(item => {
+          if ('name' in item) {
+            return item.name === source.value
+          }
+          const patterns = castArray(item.pattern)
+          return patterns.some(pattern => minimatch(source.value as string, pattern))
+        })
+
         if (foundPaths.length === 0) {
           return
         }

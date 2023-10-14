@@ -31,7 +31,7 @@ function findSameLineNodes<T extends Node>(nodes: readonly T[]) {
 interface HandleOptions<N extends BaseNodeWithoutComments, C extends Node> {
   node: N,
   message: string,
-  children: C[] | (() => C[]),
+  children: readonly C[] | (() => C[]),
 }
 
 export default {

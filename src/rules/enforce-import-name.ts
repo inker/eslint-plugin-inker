@@ -115,6 +115,15 @@ export default {
 
     type ReportDescriptor = Parameters<typeof context.report>[0]
 
+    const findPaths = (name: string) =>
+      options.paths.filter(item => {
+        if ('name' in item) {
+          return item.name === name
+        }
+        const patterns = castArray(item.pattern)
+        return patterns.some(pattern => minimatch(name, pattern))
+      })
+
     return {
       ImportDeclaration(node) {
         const {
@@ -122,14 +131,7 @@ export default {
           specifiers,
         } = node
 
-        const foundPaths = options.paths.filter(item => {
-          if ('name' in item) {
-            return item.name === source.value
-          }
-          const patterns = castArray(item.pattern)
-          return patterns.some(pattern => minimatch(source.value as string, pattern))
-        })
-
+        const foundPaths = findPaths(source.value as string)
         if (foundPaths.length === 0) {
           return
         }

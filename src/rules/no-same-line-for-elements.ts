@@ -34,46 +34,46 @@ interface HandleOptions<N extends BaseNodeWithoutComments, C extends Node> {
   children: C[] | (() => C[]),
 }
 
-const getHandler = (context: Rule.RuleContext) =>
-  <N extends BaseNodeWithoutComments, C extends Node>(options: HandleOptions<N, C>) => {
-    const { loc } = options.node
-    if (!loc || loc.start.line === loc.end.line) {
-      return
-    }
-
-    const children = invokeIfFunction(options.children)
-    if (children.length < 2) {
-      return
-    }
-
-    const isFirstItemSameLine = children[0].loc?.start.line === loc.start.line
-    // eslint-disable-next-line unicorn/prefer-at
-    const isLastItemSameLine = children[children.length - 1].loc?.end.line === loc.end.line
-    if (isFirstItemSameLine || isLastItemSameLine) {
-      return
-    }
-
-    const problematicNodes = findSameLineNodes(children)
-
-    const { message } = options
-    for (const problematicNode of problematicNodes) {
-      context.report({
-        node: problematicNode,
-        message,
-        fix(fixer) {
-          return fixer.insertTextBefore(problematicNode, '\n')
-        },
-      })
-    }
-  }
-
 export default {
   meta: {
     fixable: 'whitespace',
   },
 
   create(context) {
-    const handle = getHandler(context)
+    const handle = <
+      N extends BaseNodeWithoutComments,
+      C extends Node,
+    >(options: HandleOptions<N, C>) => {
+      const { loc } = options.node
+      if (!loc || loc.start.line === loc.end.line) {
+        return
+      }
+
+      const children = invokeIfFunction(options.children)
+      if (children.length < 2) {
+        return
+      }
+
+      const isFirstItemSameLine = children[0].loc?.start.line === loc.start.line
+      // eslint-disable-next-line unicorn/prefer-at
+      const isLastItemSameLine = children[children.length - 1].loc?.end.line === loc.end.line
+      if (isFirstItemSameLine || isLastItemSameLine) {
+        return
+      }
+
+      const problematicNodes = findSameLineNodes(children)
+
+      const { message } = options
+      for (const problematicNode of problematicNodes) {
+        context.report({
+          node: problematicNode,
+          message,
+          fix(fixer) {
+            return fixer.insertTextBefore(problematicNode, '\n')
+          },
+        })
+      }
+    }
 
     return {
       FunctionDeclaration(node) {

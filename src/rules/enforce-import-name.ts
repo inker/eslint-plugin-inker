@@ -222,7 +222,8 @@ export default {
       },
 
       VariableDeclaration(node) {
-        const { id, init } = node.declarations[0]
+        const declaration = node.declarations[0]
+        const { id, init } = declaration
         const isRequire = init
           && init.type === 'CallExpression'
           && init.callee.type === 'Identifier'
@@ -257,7 +258,9 @@ export default {
                   {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
-                      const references = context.getDeclaredVariables(prop)[0]?.references ?? []
+                      const variables = context.getDeclaredVariables(declaration)
+                      const variable = variables.find(item => item.name === value.name)
+                      const references = variable?.references ?? []
                       return [
                         fixer.replaceText(prop, `${key.name}: ${suggestedName}`),
                         ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
@@ -279,7 +282,9 @@ export default {
                   {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
-                      const references = context.getDeclaredVariables(id)[0]?.references ?? []
+                      const variables = context.getDeclaredVariables(declaration)
+                      const variable = variables.find(item => item.name === id.name)
+                      const references = variable?.references ?? []
                       return [
                         id,
                         ...references.map(ref => ref.identifier),

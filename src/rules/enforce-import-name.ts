@@ -231,13 +231,8 @@ export default {
 
       VariableDeclaration(node) {
         const {
-          type,
           declarations,
         } = node
-
-        if (type !== 'VariableDeclaration') {
-          return
-        }
 
         const { id, init } = declarations[0]
         const isRequire = init

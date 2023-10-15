@@ -2,6 +2,10 @@ import {
   type Rule,
 } from 'eslint'
 
+import {
+  type Literal,
+} from 'estree'
+
 import { minimatch } from 'minimatch'
 
 import {
@@ -138,16 +142,15 @@ export default {
 
         const importNames = foundPaths.flatMap(item => item.importNames)
         const issuesWithGaps = specifiers.map((s): ReportDescriptor | false => {
-          const importNamesNotMatchingOptions = importNames.filter(
-            o => o.local !== s.local.name,
-          )
-
           if (s.type === 'ImportSpecifier') {
-            const foundImportedName = importNamesNotMatchingOptions.find(
+            const foundImportedName = importNames.find(
               o => o.imported === s.imported.name,
             )
-            const suggestedName = foundImportedName?.local
-            return suggestedName !== undefined && {
+            if (!foundImportedName) {
+              return false
+            }
+            const suggestedName = foundImportedName.local
+            return suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -166,11 +169,14 @@ export default {
           }
 
           if (s.type === 'ImportDefaultSpecifier') {
-            const foundImportedName = importNamesNotMatchingOptions.find(
+            const foundImportedName = importNames.find(
               o => o.imported === 'default',
             )
-            const suggestedName = foundImportedName?.local
-            return suggestedName !== undefined && {
+            if (!foundImportedName) {
+              return false
+            }
+            const suggestedName = foundImportedName.local
+            return suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -189,11 +195,14 @@ export default {
           }
 
           if (s.type === 'ImportNamespaceSpecifier') {
-            const foundImportedName = importNamesNotMatchingOptions.find(
+            const foundImportedName = importNames.find(
               o => o.imported === 'namespace',
             )
-            const suggestedName = foundImportedName?.local
-            return suggestedName !== undefined && {
+            if (!foundImportedName) {
+              return false
+            }
+            const suggestedName = foundImportedName.local
+            return suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -213,6 +222,109 @@ export default {
 
           return false
         })
+        const issues = compact(issuesWithGaps)
+
+        for (const issue of issues) {
+          context.report(issue)
+        }
+      },
+
+      VariableDeclaration(node) {
+        const {
+          type,
+          declarations,
+        } = node
+
+        if (type !== 'VariableDeclaration') {
+          return
+        }
+
+        const { id, init } = declarations[0]
+        const isRequire = init
+          && init.type === 'CallExpression'
+          && init.callee.type === 'Identifier'
+          && init.callee.name === 'require'
+        if (!isRequire) {
+          return
+        }
+
+        const source = init.arguments[0] as Literal
+        const foundPaths = findPaths(source.value as string)
+        if (foundPaths.length === 0) {
+          return
+        }
+
+        const importNames = foundPaths.flatMap(item => item.importNames)
+        const issuesWithGaps = ((): (ReportDescriptor | false)[] => {
+          if (id.type === 'ObjectPattern') {
+            return id.properties.map(prop => {
+              const { type: propType } = prop
+              if (propType !== 'Property') {
+                return false
+              }
+              const { key, value } = prop
+              if (key.type !== 'Identifier' || value.type !== 'Identifier') {
+                return false
+              }
+              const keyName = key.name
+              const valueName = value.name
+              const foundImportedName = importNames.find(
+                o => o.imported === keyName,
+              )
+              if (!foundImportedName) {
+                return false
+              }
+              const suggestedName = foundImportedName.local
+              return suggestedName !== valueName && {
+                node: value,
+                message: `Local name should be "${suggestedName}"`,
+                suggest: [
+                  {
+                    desc: `Rename to '${suggestedName}'`,
+                    fix(fixer) {
+                      const references = context.getDeclaredVariables(prop)[0]?.references ?? []
+                      return [
+                        fixer.replaceText(prop, `${keyName}: ${suggestedName}`),
+                        ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
+                      ]
+                    },
+                  },
+                ],
+              }
+            })
+          }
+
+          if (id.type === 'Identifier') {
+            const foundImportedName = importNames.find(
+              o => o.imported === 'default' || o.imported === 'namespace',
+            )
+            if (!foundImportedName) {
+              return []
+            }
+            const suggestedName = foundImportedName.local
+            return [
+              suggestedName !== id.name && {
+                node: id,
+                message: `Local name should be "${suggestedName}"`,
+                suggest: [
+                  {
+                    desc: `Rename to '${suggestedName}'`,
+                    fix(fixer) {
+                      const references = context.getDeclaredVariables(id)[0]?.references ?? []
+                      return [
+                        id,
+                        ...references.map(ref => ref.identifier),
+                      ].map(identifier => fixer.replaceText(identifier, suggestedName))
+                    },
+                  },
+                ],
+              },
+            ]
+          }
+
+          return []
+        })()
+
         const issues = compact(issuesWithGaps)
 
         for (const issue of issues) {

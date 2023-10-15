@@ -17,6 +17,8 @@ import {
   compact,
 } from 'lodash'
 
+import mergeMaps from '../utils/mergeMaps'
+
 interface ImportNameObj {
   imported: string,
   local: string,
@@ -117,10 +119,17 @@ export default {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: Options = context.options[0] ?? {}
 
+    const pathsTransformed = options.paths.map(item => ({
+      ...item,
+      localByImported: new Map(
+        item.importNames.map(o => [o.imported, o.local] as const),
+      ),
+    }))
+
     type ReportDescriptor = Parameters<typeof context.report>[0]
 
     const findPaths = (name: string) =>
-      options.paths.filter(item => {
+      pathsTransformed.filter(item => {
         if ('name' in item) {
           return item.name === name
         }
@@ -140,17 +149,11 @@ export default {
           return
         }
 
-        const importNames = foundPaths.flatMap(item => item.importNames)
+        const localByImported = new Map(foundPaths.flatMap(item => [...item.localByImported]))
         const issuesWithGaps = specifiers.map((s): ReportDescriptor | false => {
           if (s.type === 'ImportSpecifier') {
-            const foundImportedName = importNames.find(
-              o => o.imported === s.imported.name,
-            )
-            if (!foundImportedName) {
-              return false
-            }
-            const suggestedName = foundImportedName.local
-            return suggestedName !== s.local.name && {
+            const suggestedName = localByImported.get(s.imported.name)
+            return !!suggestedName && suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -169,14 +172,8 @@ export default {
           }
 
           if (s.type === 'ImportDefaultSpecifier') {
-            const foundImportedName = importNames.find(
-              o => o.imported === 'default',
-            )
-            if (!foundImportedName) {
-              return false
-            }
-            const suggestedName = foundImportedName.local
-            return suggestedName !== s.local.name && {
+            const suggestedName = localByImported.get('default')
+            return !!suggestedName && suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -195,14 +192,8 @@ export default {
           }
 
           if (s.type === 'ImportNamespaceSpecifier') {
-            const foundImportedName = importNames.find(
-              o => o.imported === 'namespace',
-            )
-            if (!foundImportedName) {
-              return false
-            }
-            const suggestedName = foundImportedName.local
-            return suggestedName !== s.local.name && {
+            const suggestedName = localByImported.get('namespace')
+            return !!suggestedName && suggestedName !== s.local.name && {
               node: s.local,
               message: `Local name should be "${suggestedName}"`,
               suggest: [
@@ -222,6 +213,7 @@ export default {
 
           return false
         })
+
         const issues = compact(issuesWithGaps)
 
         for (const issue of issues) {
@@ -230,11 +222,7 @@ export default {
       },
 
       VariableDeclaration(node) {
-        const {
-          declarations,
-        } = node
-
-        const { id, init } = declarations[0]
+        const { id, init } = node.declarations[0]
         const isRequire = init
           && init.type === 'CallExpression'
           && init.callee.type === 'Identifier'
@@ -249,7 +237,7 @@ export default {
           return
         }
 
-        const importNames = foundPaths.flatMap(item => item.importNames)
+        const localByImported = mergeMaps(foundPaths.map(item => item.localByImported))
         const issuesWithGaps = ((): (ReportDescriptor | false)[] => {
           if (id.type === 'ObjectPattern') {
             return id.properties.map(prop => {
@@ -261,16 +249,8 @@ export default {
               if (key.type !== 'Identifier' || value.type !== 'Identifier') {
                 return false
               }
-              const keyName = key.name
-              const valueName = value.name
-              const foundImportedName = importNames.find(
-                o => o.imported === keyName,
-              )
-              if (!foundImportedName) {
-                return false
-              }
-              const suggestedName = foundImportedName.local
-              return suggestedName !== valueName && {
+              const suggestedName = localByImported.get(key.name)
+              return !!suggestedName && suggestedName !== value.name && {
                 node: value,
                 message: `Local name should be "${suggestedName}"`,
                 suggest: [
@@ -279,7 +259,7 @@ export default {
                     fix(fixer) {
                       const references = context.getDeclaredVariables(prop)[0]?.references ?? []
                       return [
-                        fixer.replaceText(prop, `${keyName}: ${suggestedName}`),
+                        fixer.replaceText(prop, `${key.name}: ${suggestedName}`),
                         ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
                       ]
                     },
@@ -290,15 +270,9 @@ export default {
           }
 
           if (id.type === 'Identifier') {
-            const foundImportedName = importNames.find(
-              o => o.imported === 'default' || o.imported === 'namespace',
-            )
-            if (!foundImportedName) {
-              return []
-            }
-            const suggestedName = foundImportedName.local
+            const suggestedName = localByImported.get('default') ?? localByImported.get('namespace')
             return [
-              suggestedName !== id.name && {
+              !!suggestedName && suggestedName !== id.name && {
                 node: id,
                 message: `Local name should be "${suggestedName}"`,
                 suggest: [

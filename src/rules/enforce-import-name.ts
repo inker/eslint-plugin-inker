@@ -254,18 +254,6 @@ export default {
               return !!suggestedName && suggestedName !== value.name && {
                 node: value,
                 message: `Local name should be "${suggestedName}"`,
-                suggest: [
-                  {
-                    desc: `Rename to '${suggestedName}'`,
-                    fix(fixer) {
-                      const references = context.getDeclaredVariables(prop)[0]?.references ?? []
-                      return [
-                        fixer.replaceText(prop, `${key.name}: ${suggestedName}`),
-                        ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
-                      ]
-                    },
-                  },
-                ],
               }
             })
           }
@@ -276,19 +264,6 @@ export default {
               !!suggestedName && suggestedName !== id.name && {
                 node: id,
                 message: `Local name should be "${suggestedName}"`,
-                suggest: [
-                  {
-                    desc: `Rename to '${suggestedName}'`,
-                    fix(fixer) {
-                      // eslint-disable-next-line max-len
-                      const references = context.getDeclaredVariables(declaration)[0]?.references ?? []
-                      return [
-                        id,
-                        ...references.map(ref => ref.identifier),
-                      ].map(identifier => fixer.replaceText(identifier, suggestedName))
-                    },
-                  },
-                ],
               },
             ]
           }

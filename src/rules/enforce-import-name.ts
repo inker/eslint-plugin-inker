@@ -258,9 +258,7 @@ export default {
                   {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
-                      const variables = context.getDeclaredVariables(declaration)
-                      const variable = variables.find(item => item.name === value.name)
-                      const references = variable?.references ?? []
+                      const references = context.getDeclaredVariables(prop)[0]?.references ?? []
                       return [
                         fixer.replaceText(prop, `${key.name}: ${suggestedName}`),
                         ...references.map(ref => fixer.replaceText(ref.identifier, suggestedName)),
@@ -282,9 +280,8 @@ export default {
                   {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
-                      const variables = context.getDeclaredVariables(declaration)
-                      const variable = variables.find(item => item.name === id.name)
-                      const references = variable?.references ?? []
+                      // eslint-disable-next-line max-len
+                      const references = context.getDeclaredVariables(declaration)[0]?.references ?? []
                       return [
                         id,
                         ...references.map(ref => ref.identifier),

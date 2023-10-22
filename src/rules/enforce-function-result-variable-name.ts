@@ -71,7 +71,7 @@ export default {
           .join(', ')
 
         context.report({
-          node,
+          node: id,
           message: `Variable assigned by the result of ${functionName}(...) should have one of the following names: ${suggestedNamesStr}.`,
         })
       },

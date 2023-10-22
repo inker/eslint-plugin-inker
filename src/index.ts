@@ -1,3 +1,4 @@
+import enforceFunctionResultVariableName from './rules/enforce-function-result-variable-name'
 import enforceImportName from './rules/enforce-import-name'
 import jsxNoClassnameTemplateString from './rules/jsx-no-classname-template-string'
 import moduleImportOrder from './rules/module-import-order'
@@ -11,6 +12,7 @@ import singleImportPerLine from './rules/single-import-per-line'
 
 export = {
   rules: {
+    'enforce-function-result-variable-name': enforceFunctionResultVariableName,
     'enforce-import-name': enforceImportName,
     'jsx-no-classname-template-string': jsxNoClassnameTemplateString,
     'module-import-order': moduleImportOrder,

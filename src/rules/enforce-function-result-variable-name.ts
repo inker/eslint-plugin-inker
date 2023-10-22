@@ -62,7 +62,7 @@ export default {
 
         const functionName = (init.callee as Identifier).name
         const allowedVariableNames = variableNamesByFunctionName[functionName]
-        if (allowedVariableNames.has(id.name)) {
+        if (!allowedVariableNames || allowedVariableNames.has(id.name)) {
           return
         }
 

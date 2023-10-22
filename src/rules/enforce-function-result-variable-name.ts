@@ -40,7 +40,7 @@ export default {
   create(context) {
     const functionConfigs = (context.options[0] ?? []) as FunctionConfig[]
     const groups = groupBy(functionConfigs, o => o.functionName)
-    const variableNamesByFunctioName = mapValues(
+    const variableNamesByFunctionName = mapValues(
       groups,
       arr => new Set(arr.map(o => o.variableName)),
     )
@@ -61,7 +61,7 @@ export default {
         }
 
         const functionName = (init.callee as Identifier).name
-        const allowedVariableNames = variableNamesByFunctioName[functionName]
+        const allowedVariableNames = variableNamesByFunctionName[functionName]
         if (allowedVariableNames.has(id.name)) {
           return
         }

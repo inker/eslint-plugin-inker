@@ -119,12 +119,21 @@ export default {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: Options = context.options[0] ?? {}
 
+    type PathWithPatterns = Omit<PathWithPattern, 'pattern'> & {
+      patterns: readonly string[],
+    }
+
+    type PathTransformed = (PathWithName | PathWithPatterns) & {
+      localByImported: ReadonlyMap<string, string>,
+    }
+
     const pathsTransformed = options.paths.map(item => ({
       ...item,
       localByImported: new Map(
         item.importNames.map(o => [o.imported, o.local] as const),
       ),
-    }))
+      patterns: 'pattern' in item ? castArray(item.pattern) : undefined,
+    } as PathTransformed))
 
     type ReportDescriptor = Parameters<typeof context.report>[0]
 
@@ -133,7 +142,7 @@ export default {
         if ('name' in item) {
           return item.name === name
         }
-        const patterns = castArray(item.pattern)
+        const { patterns } = item
         return patterns.some(pattern => minimatch(name, pattern))
       })
 

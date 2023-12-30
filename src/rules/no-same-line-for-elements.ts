@@ -36,6 +36,7 @@ interface HandleOptions<N extends BaseNodeWithoutComments, C extends Node> {
 
 export default {
   meta: {
+    deprecated: true,
     fixable: 'whitespace',
   },
 

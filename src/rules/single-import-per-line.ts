@@ -4,6 +4,7 @@ import {
 
 export default {
   meta: {
+    deprecated: true,
     fixable: 'whitespace',
   },
 

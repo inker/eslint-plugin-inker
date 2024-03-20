@@ -1,129 +1,125 @@
-import {
-  compact,
-} from 'lodash'
+import { compact } from "lodash";
 
-import {
-  type Rule,
-} from 'eslint'
+import { type Rule } from "eslint";
 
-import {
-  type BaseNodeWithoutComments,
-  type Node,
-} from 'estree'
+import { type BaseNodeWithoutComments, type Node } from "estree";
 
-import invokeIfFunction from '../utils/invokeIfFunction'
+import invokeIfFunction from "../utils/invokeIfFunction";
 
 function findSameLineNodes<T extends Node>(nodes: readonly T[]) {
-  const problematicNodes: T[] = []
+  const problematicNodes: T[] = [];
 
-  let prevNode = nodes[0]
+  let prevNode = nodes[0];
   for (let i = 1; i < nodes.length; ++i) {
-    const node = nodes[i]
+    const node = nodes[i];
     if (node.loc!.start.line === prevNode.loc!.end.line) {
-      problematicNodes.push(node)
+      problematicNodes.push(node);
     }
-    prevNode = node
+    prevNode = node;
   }
 
-  return problematicNodes
+  return problematicNodes;
 }
 
 interface HandleOptions<N extends BaseNodeWithoutComments, C extends Node> {
-  node: N,
-  message: string,
-  children: readonly C[] | (() => C[]),
+  node: N;
+  message: string;
+  children: readonly C[] | (() => C[]);
 }
 
 export default {
   meta: {
     deprecated: true,
-    fixable: 'whitespace',
+    fixable: "whitespace",
   },
 
   create(context) {
-    const handle = <
-      N extends BaseNodeWithoutComments,
-      C extends Node,
-    >(options: HandleOptions<N, C>) => {
-      const { loc } = options.node
+    const handle = <N extends BaseNodeWithoutComments, C extends Node>(
+      options: HandleOptions<N, C>,
+    ) => {
+      const { loc } = options.node;
       if (!loc || loc.start.line === loc.end.line) {
-        return
+        return;
       }
 
-      const children = invokeIfFunction(options.children)
+      const children = invokeIfFunction(options.children);
       if (children.length < 2) {
-        return
+        return;
       }
 
-      const isFirstItemSameLine = children[0].loc?.start.line === loc.start.line
+      const isFirstItemSameLine =
+        children[0].loc?.start.line === loc.start.line;
       // eslint-disable-next-line unicorn/prefer-at
-      const isLastItemSameLine = children[children.length - 1].loc?.end.line === loc.end.line
+      const isLastItemSameLine =
+        children[children.length - 1].loc?.end.line === loc.end.line;
       if (isFirstItemSameLine || isLastItemSameLine) {
-        return
+        return;
       }
 
-      const problematicNodes = findSameLineNodes(children)
+      const problematicNodes = findSameLineNodes(children);
 
-      const { message } = options
+      const { message } = options;
       for (const problematicNode of problematicNodes) {
         context.report({
           node: problematicNode,
           message,
           fix(fixer) {
-            return fixer.insertTextBefore(problematicNode, '\n')
+            return fixer.insertTextBefore(problematicNode, "\n");
           },
-        })
+        });
       }
-    }
+    };
 
     return {
       FunctionDeclaration(node) {
         handle({
           node,
-          message: 'Function parameters must be on separate lines',
+          message: "Function parameters must be on separate lines",
           children: node.params,
-        })
+        });
       },
 
       CallExpression(node) {
         handle({
           node,
-          message: 'Function arguments must be on separate lines',
+          message: "Function arguments must be on separate lines",
           children: node.arguments,
-        })
+        });
       },
 
       ArrayExpression(node) {
         handle({
           node,
-          message: 'Array elements must be on separate lines',
+          message: "Array elements must be on separate lines",
           children: () => compact(node.elements),
-        })
+        });
       },
 
       ArrayPattern(node) {
         handle({
           node,
-          message: 'Variables from array destructuring must be on separate lines',
+          message:
+            "Variables from array destructuring must be on separate lines",
           children: () => compact(node.elements),
-        })
+        });
       },
 
       ObjectExpression(node) {
         handle({
           node,
-          message: 'Object properties must be on separate lines',
+          message: "Object properties must be on separate lines",
           children: node.properties,
-        })
+        });
       },
 
       ObjectPattern(node) {
         handle({
           node,
-          message: 'Variables from object destructuring must be on separate lines',
+          message:
+            "Variables from object destructuring must be on separate lines",
           children: node.properties,
-        })
+        });
       },
-    }
+    };
   },
-} as Rule.RuleModule
+} as Rule.RuleModule;

@@ -1,19 +1,10 @@
-import {
-  type Rule,
-} from 'eslint'
+import { type Rule } from "eslint";
 
-import {
-  type PropertyDefinition,
-  type VariableDeclarator,
-} from 'estree'
+import { type PropertyDefinition, type VariableDeclarator } from "estree";
 
-const refCreationFuncNames = new Set([
-  'createRef',
-  'useRef',
-])
+const refCreationFuncNames = new Set(["createRef", "useRef"]);
 
-const isIdValidName = (name: string) =>
-  name === 'ref' || name.endsWith('Ref')
+const isIdValidName = (name: string) => name === "ref" || name.endsWith("Ref");
 
 export default {
   meta: {
@@ -22,84 +13,92 @@ export default {
 
   create(context) {
     const variableDeclaratorStrategy = (node: VariableDeclarator) => {
-      const { id } = node
-      if (id.type !== 'Identifier') {
-        return
+      const { id } = node;
+      if (id.type !== "Identifier") {
+        return;
       }
 
       if (isIdValidName(id.name)) {
-        return
+        return;
       }
 
-      const suggestedName = `${id.name}Ref`
+      const suggestedName = `${id.name}Ref`;
 
-      const scope = context.getScope()
-      const isNameTaken = scope.variables.some(variable => variable.name === suggestedName)
+      const scope = context.getScope();
+      const isNameTaken = scope.variables.some(
+        variable => variable.name === suggestedName,
+      );
 
-      type Suggest = Parameters<typeof context.report>[0]['suggest']
+      type Suggest = Parameters<typeof context.report>[0]["suggest"];
       const suggest: Suggest = isNameTaken
         ? undefined
         : [
-          {
-            desc: `Rename variable to '${suggestedName}'`,
-            fix(fixer) {
-              const references = context.getDeclaredVariables(node)[0]?.references ?? []
-              return references.map(ref => fixer.replaceText(ref.identifier, suggestedName))
+            {
+              desc: `Rename variable to '${suggestedName}'`,
+              fix(fixer) {
+                const references =
+                  context.getDeclaredVariables(node)[0]?.references ?? [];
+                return references.map(ref =>
+                  fixer.replaceText(ref.identifier, suggestedName),
+                );
+              },
             },
-          },
-        ]
+          ];
 
       context.report({
         node: id,
         message: 'Variable name should be "ref" or end with "Ref".',
         suggest,
-      })
-    }
+      });
+    };
 
     const propertyDefinitionStrategy = (node: PropertyDefinition) => {
-      const { key } = node
-      if (key.type !== 'Identifier') {
-        return
+      const { key } = node;
+      if (key.type !== "Identifier") {
+        return;
       }
 
       if (isIdValidName(key.name)) {
-        return
+        return;
       }
 
       context.report({
         node: key,
         message: 'Property name should be "ref" or end with "Ref".',
-      })
-    }
+      });
+    };
 
     return {
       CallExpression(node) {
-        if (node.type !== 'CallExpression') {
-          return
+        if (node.type !== "CallExpression") {
+          return;
         }
 
-        const { callee } = node
-        if (callee.type !== 'Identifier' || !refCreationFuncNames.has(callee.name)) {
-          return
+        const { callee } = node;
+        if (
+          callee.type !== "Identifier" ||
+          !refCreationFuncNames.has(callee.name)
+        ) {
+          return;
         }
 
-        const { parent } = node
+        const { parent } = node;
         switch (parent.type) {
-          case 'VariableDeclarator': {
-            variableDeclaratorStrategy(parent)
-            break
+          case "VariableDeclarator": {
+            variableDeclaratorStrategy(parent);
+            break;
           }
 
-          case 'PropertyDefinition': {
-            propertyDefinitionStrategy(parent)
-            break
+          case "PropertyDefinition": {
+            propertyDefinitionStrategy(parent);
+            break;
           }
 
           default: {
-            break
+            break;
           }
         }
       },
-    }
+    };
   },
-} as Rule.RuleModule
+} as Rule.RuleModule;

@@ -11,16 +11,9 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "isolatedModules": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "outDir": "dist"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "test"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "test"]
 }

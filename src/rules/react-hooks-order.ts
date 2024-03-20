@@ -1,25 +1,21 @@
-import {
-  type Rule,
-} from 'eslint'
+import { type Rule } from "eslint";
 
-import {
-  type VariableDeclaration,
-} from 'estree'
+import { type VariableDeclaration } from "estree";
 
 interface Options {
-  order: readonly string[],
+  order: readonly string[];
 }
 
 export default {
   meta: {
     schema: [
       {
-        type: 'object',
+        type: "object",
         properties: {
           order: {
-            type: 'array',
+            type: "array",
             items: {
-              type: 'string',
+              type: "string",
             },
           },
         },
@@ -29,46 +25,46 @@ export default {
   },
 
   create(context) {
-    const { order } = context.options[0] as Options
+    const { order } = context.options[0] as Options;
 
-    const indexByHook = new Map(order.map((hook, i) => [hook, i] as const))
+    const indexByHook = new Map(order.map((hook, i) => [hook, i] as const));
 
     const getHookIndex = (name: string) =>
-      indexByHook.get(name) ?? Number.MAX_SAFE_INTEGER
+      indexByHook.get(name) ?? Number.MAX_SAFE_INTEGER;
 
     return {
       BlockStatement(node) {
-        const previousHooks = new Map<string, VariableDeclaration>()
+        const previousHooks = new Map<string, VariableDeclaration>();
 
         for (const statement of node.body) {
-          if (statement.type !== 'VariableDeclaration') {
-            continue
+          if (statement.type !== "VariableDeclaration") {
+            continue;
           }
 
           for (const declarator of statement.declarations) {
-            if (declarator.type !== 'VariableDeclarator') {
-              continue
+            if (declarator.type !== "VariableDeclarator") {
+              continue;
             }
 
-            const { init } = declarator
-            if (!init || init.type !== 'CallExpression') {
-              continue
+            const { init } = declarator;
+            if (!init || init.type !== "CallExpression") {
+              continue;
             }
 
-            const { callee } = init
-            if (callee.type !== 'Identifier') {
-              continue
+            const { callee } = init;
+            if (callee.type !== "Identifier") {
+              continue;
             }
 
-            const { name } = callee
-            if (!name.startsWith('use')) {
-              continue
+            const { name } = callee;
+            if (!name.startsWith("use")) {
+              continue;
             }
 
-            const hookIdx = getHookIndex(name)
+            const hookIdx = getHookIndex(name);
 
             for (const [prevHookName, prevHookNode] of previousHooks) {
-              const prevHookIdx = getHookIndex(prevHookName)
+              const prevHookIdx = getHookIndex(prevHookName);
               if (hookIdx < prevHookIdx) {
                 context.report({
                   node: statement,
@@ -77,33 +73,38 @@ export default {
                     {
                       desc: `Move before first '${prevHookName}'`,
                       fix(fixer) {
-                        const { sourceCode } = context
+                        const { sourceCode } = context;
 
-                        const statementText = sourceCode.getText(statement)
-                        const statementTextWithSemicolon = statementText.endsWith(';')
-                          ? statementText
-                          : `${statementText};`
-                        const prevHookNodeIndentation = prevHookNode.loc?.start.column ?? 0
-                        const indentation = ' '.repeat(prevHookNodeIndentation)
+                        const statementText = sourceCode.getText(statement);
+                        const statementTextWithSemicolon =
+                          statementText.endsWith(";")
+                            ? statementText
+                            : `${statementText};`;
+                        const prevHookNodeIndentation =
+                          prevHookNode.loc?.start.column ?? 0;
+                        const indentation = " ".repeat(prevHookNodeIndentation);
                         return [
                           fixer.remove(statement),
-                          fixer.insertTextBefore(prevHookNode, `${statementTextWithSemicolon}\n${indentation}`),
-                        ]
+                          fixer.insertTextBefore(
+                            prevHookNode,
+                            `${statementTextWithSemicolon}\n${indentation}`,
+                          ),
+                        ];
                       },
                     },
                   ],
-                })
-                return
+                });
+                return;
               }
             }
 
             // TODO: replace with "upsert" once it's available
             if (!previousHooks.has(name)) {
-              previousHooks.set(name, statement)
+              previousHooks.set(name, statement);
             }
           }
         }
       },
-    }
+    };
   },
-} as Rule.RuleModule
+} as Rule.RuleModule;

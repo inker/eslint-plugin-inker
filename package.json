@@ -10,6 +10,7 @@
   "scripts": {
     "test": "echo \"no test\"",
     "lint": "eslint './src/**/*.ts'",
+    "prettier": "prettier --cache --check .",
     "build": "rm -rf dist && tsc --outDir dist",
     "release": "np --no-cleanup"
   },
@@ -28,7 +29,9 @@
     "@types/lodash": "^4.14.182",
     "@typescript-eslint/parser": "^7.1.1",
     "eslint": "^8.20.0",
+    "eslint-config-prettier": "^9.1.0",
     "np": "^10.0.1",
+    "prettier": "^3.2.5",
     "typescript": "^5.0.4"
   },
   "dependencies": {

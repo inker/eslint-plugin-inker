@@ -21,14 +21,14 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/types": "^7.23.0",
-    "@inker/eslint-config-typescript": "^10.3.0",
+    "@inker/eslint-config-typescript": "^11.1.0",
     "@types/eslint": "^8.4.5",
     "@types/estree": "^1.0.0",
     "@types/json-schema": "^7.0.12",
     "@types/lodash": "^4.14.182",
     "@typescript-eslint/parser": "^7.1.1",
     "eslint": "^8.20.0",
-    "np": "^9.2.0",
+    "np": "^10.0.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {

@@ -49,9 +49,8 @@ export default {
 
       const isFirstItemSameLine =
         children[0].loc?.start.line === loc.start.line;
-      // eslint-disable-next-line unicorn/prefer-at
       const isLastItemSameLine =
-        children[children.length - 1].loc?.end.line === loc.end.line;
+        children.at(-1)!.loc?.end.line === loc.end.line;
       if (isFirstItemSameLine || isLastItemSameLine) {
         return;
       }

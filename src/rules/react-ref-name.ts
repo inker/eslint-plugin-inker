@@ -24,7 +24,7 @@ export default {
 
       const suggestedName = `${id.name}Ref`;
 
-      const scope = context.getScope();
+      const scope = context.sourceCode.getScope(node);
       const isNameTaken = scope.variables.some(
         variable => variable.name === suggestedName,
       );
@@ -37,7 +37,8 @@ export default {
               desc: `Rename variable to '${suggestedName}'`,
               fix(fixer) {
                 const references =
-                  context.getDeclaredVariables(node)[0]?.references ?? [];
+                  context.sourceCode.getDeclaredVariables(node)[0]
+                    ?.references ?? [];
                 return references.map(ref =>
                   fixer.replaceText(ref.identifier, suggestedName),
                 );

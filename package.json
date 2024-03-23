@@ -8,7 +8,7 @@
     "node": ">= 16.0.0"
   },
   "scripts": {
-    "test": "echo \"no test\"",
+    "test": "vitest",
     "lint": "eslint './src/**/*.ts'",
     "prettier": "prettier --cache --check .",
     "build": "rm -rf dist && tsc --outDir dist",
@@ -32,7 +32,8 @@
     "eslint-config-prettier": "^9.1.0",
     "np": "^10.0.1",
     "prettier": "^3.2.5",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^1.4.0"
   },
   "dependencies": {
     "lodash": "^4.17.21",

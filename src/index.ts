@@ -2,6 +2,7 @@ import enforceFunctionResultVariableName from "./rules/enforce-function-result-v
 import enforceImportName from "./rules/enforce-import-name";
 import jsxNoClassnameTemplateString from "./rules/jsx-no-classname-template-string";
 import moduleImportOrder from "./rules/module-import-order";
+import nodeReqHeaderCasing from "./rules/node-req-header-casing";
 import noObjectAssignThis from "./rules/no-object-assign-this";
 import noSameLineForElements from "./rules/no-same-line-for-elements";
 import noThisBrackets from "./rules/no-this-brackets";
@@ -16,6 +17,7 @@ export = {
     "enforce-import-name": enforceImportName,
     "jsx-no-classname-template-string": jsxNoClassnameTemplateString,
     "module-import-order": moduleImportOrder,
+    "node-req-header-casing": nodeReqHeaderCasing,
     "no-object-assign-this": noObjectAssignThis,
     "no-same-line-for-elements": noSameLineForElements,
     "no-this-brackets": noThisBrackets,

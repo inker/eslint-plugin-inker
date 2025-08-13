@@ -2,8 +2,8 @@ import { RuleTester } from "eslint";
 import rule from "../src/rules/react-ref-name";
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2022,
+  languageOptions: {
+    ecmaVersion: 2024,
   },
 });
 
@@ -30,6 +30,7 @@ ruleTester.run("inker/react-ref-name", rule, {
           message: 'Variable name should be "ref" or end with "Ref".',
           suggestions: [
             {
+              desc: "Rename variable to 'someVariableRef'",
               output: "const someVariableRef = createRef();",
             },
           ],
@@ -43,6 +44,7 @@ ruleTester.run("inker/react-ref-name", rule, {
           message: 'Variable name should be "ref" or end with "Ref".',
           suggestions: [
             {
+              desc: "Rename variable to 'someVariableRef'",
               output: "const someVariableRef = useRef();",
             },
           ],

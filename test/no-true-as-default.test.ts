@@ -2,8 +2,8 @@ import { RuleTester } from "eslint";
 import rule from "../src/rules/no-true-as-default";
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2022,
+  languageOptions: {
+    ecmaVersion: 2024,
   },
 });
 

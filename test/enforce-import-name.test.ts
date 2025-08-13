@@ -2,8 +2,8 @@ import { RuleTester } from "eslint";
 import rule from "../src/rules/enforce-import-name";
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2022,
+  languageOptions: {
+    ecmaVersion: 2024,
     sourceType: "module",
   },
 });
@@ -11,10 +11,9 @@ const ruleTester = new RuleTester({
 ruleTester.run("inker/enforce-import-name", rule, {
   valid: [
     {
-      code: `
-        import { something } from "some-module";
-        const { somethingElse } = require("another-module");
-      `,
+      code: `import { something } from "some-module";
+const { somethingElse } = require("another-module");
+`,
       options: [
         {
           paths: [
@@ -41,10 +40,9 @@ ruleTester.run("inker/enforce-import-name", rule, {
       ],
     },
     {
-      code: `
-        import * as utils from "utils";
-        const { helper } = require("helper");
-      `,
+      code: `import * as utils from "utils";
+const { helper } = require("helper");
+`,
       options: [
         {
           paths: [
@@ -73,10 +71,8 @@ ruleTester.run("inker/enforce-import-name", rule, {
   ],
   invalid: [
     {
-      code: `
-        import { something } from "some-module";
-        const { somethingElse } = require("another-module");
-      `,
+      code: `import { something } from "some-module";
+const { somethingElse } = require("another-module");`,
       options: [
         {
           paths: [
@@ -104,6 +100,13 @@ ruleTester.run("inker/enforce-import-name", rule, {
       errors: [
         {
           message: 'Local name should be "some"',
+          suggestions: [
+            {
+              desc: "Rename to 'some'",
+              output: `import { something as some } from "some-module";
+const { somethingElse } = require("another-module");`,
+            },
+          ],
         },
         {
           message: 'Local name should be "somethingElse2"',
@@ -111,9 +114,7 @@ ruleTester.run("inker/enforce-import-name", rule, {
       ],
     },
     {
-      code: `
-        const { helper } = require("helper");
-      `,
+      code: `const { helper } = require("helper");`,
       options: [
         {
           paths: [
@@ -136,9 +137,7 @@ ruleTester.run("inker/enforce-import-name", rule, {
       ],
     },
     {
-      code: `
-        import bar from "foo";
-      `,
+      code: `import bar from "foo";`,
       options: [
         {
           paths: [
@@ -157,14 +156,18 @@ ruleTester.run("inker/enforce-import-name", rule, {
       errors: [
         {
           message: 'Local name should be "foo"',
+          suggestions: [
+            {
+              desc: "Rename to 'foo'",
+              output: `import foo from "foo";`,
+            },
+          ],
         },
       ],
     },
     {
-      code: `
-        import * as bar from "foo";
-        const qux = require("foo");
-      `,
+      code: `import * as bar from "foo";
+const qux = require("foo");`,
       options: [
         {
           paths: [
@@ -183,6 +186,13 @@ ruleTester.run("inker/enforce-import-name", rule, {
       errors: [
         {
           message: 'Local name should be "foo"',
+          suggestions: [
+            {
+              desc: "Rename to 'foo'",
+              output: `import * as foo from "foo";
+const qux = require("foo");`,
+            },
+          ],
         },
         {
           message: 'Local name should be "foo"',

@@ -144,8 +144,12 @@ export default {
           foundPaths.flatMap(item => [...item.localByImported]),
         );
         const issuesWithGaps = specifiers.map((s): ReportDescriptor | false => {
-          if (s.type === "ImportSpecifier") {
+          if (
+            s.type === "ImportSpecifier" &&
+            s.imported.type === "Identifier"
+          ) {
             const suggestedName = localByImported.get(s.imported.name);
+            const { imported } = s;
             return (
               !!suggestedName &&
               suggestedName !== s.local.name && {
@@ -156,11 +160,12 @@ export default {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
                       const references =
-                        context.getDeclaredVariables(s)[0]?.references ?? [];
+                        context.sourceCode.getDeclaredVariables(s)[0]
+                          ?.references ?? [];
                       return [
                         fixer.replaceText(
                           s,
-                          `${s.imported.name} as ${suggestedName}`,
+                          `${imported.name} as ${suggestedName}`,
                         ),
                         ...references.map(ref =>
                           fixer.replaceText(ref.identifier, suggestedName),
@@ -185,7 +190,8 @@ export default {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
                       const references =
-                        context.getDeclaredVariables(s)[0]?.references ?? [];
+                        context.sourceCode.getDeclaredVariables(s)[0]
+                          ?.references ?? [];
                       return [
                         s.local,
                         ...references.map(ref => ref.identifier),
@@ -211,7 +217,8 @@ export default {
                     desc: `Rename to '${suggestedName}'`,
                     fix(fixer) {
                       const references =
-                        context.getDeclaredVariables(s)[0]?.references ?? [];
+                        context.sourceCode.getDeclaredVariables(s)[0]
+                          ?.references ?? [];
                       return [
                         s.local,
                         ...references.map(ref => ref.identifier),

@@ -2,7 +2,7 @@ import { orderBy } from "lodash";
 
 import { type Rule } from "eslint";
 
-import { type ImportSpecifier } from "estree";
+import { type Identifier, type ImportSpecifier } from "estree";
 
 import isNonDecreasing from "../utils/isNonDecreasing";
 
@@ -82,7 +82,7 @@ export default {
         }
 
         const iteratee = (item: ImportSpecifier) =>
-          o[item.imported.name] ?? o[WILDCARD_OTHER];
+          o[(item.imported as Identifier).name] ?? o[WILDCARD_OTHER];
 
         const importedMembers = specifiers.filter(
           item => item.type === "ImportSpecifier",

@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "engines": {
-    "node": ">= 16.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "test": "vitest",
@@ -37,6 +37,6 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "minimatch": "^9.0.3"
+    "minimatch": "^10.0.3"
   }
 }

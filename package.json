@@ -37,6 +37,6 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "minimatch": "^10.0.3"
+    "minimatch": "^11.0.9"
   }
 }
